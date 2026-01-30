@@ -1,13 +1,29 @@
 import discord
 from discord.ext import tasks
 import requests
-import os # 보안 설정을 위해 추가
+import os
+from flask import Flask
+from threading import Thread
 
-# --- 설정 구간 (보안 적용) ---
-# GitHub에 올릴 때는 토큰을 직접 적지 않고 os.environ을 씁니다.
-TOKEN = os.environ.get('DISCORD_TOKEN') 
-CHANNEL_ID = 123456789012345678 # 본인의 채널 ID (숫자)
-BJ_ID = 'leesh2148' # 대상 BJ 아이디
+# --- 1. 가짜 웹사이트 설정 (Render가 봇을 죽이지 않게 함) ---
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "I am alive! (Bot is running)"
+
+def run():
+    # Render는 기본적으로 10000번 포트 등을 사용하려 시도함
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# --- 2. 봇 설정 ---
+TOKEN = os.environ.get('DISCORD_TOKEN')
+CHANNEL_ID = 123456789012345678 # [수정필요] 본인의 채널 ID 숫자
+BJ_ID = 'target_id' # [수정필요] 대상 BJ 아이디
 
 class SoopBot(discord.Client):
     def __init__(self):
@@ -27,7 +43,6 @@ class SoopBot(discord.Client):
             res = requests.get(url, headers=headers)
             data = res.json()
             
-            # 수정된 핵심 로직
             is_live = False
             if "broad" in data and data["broad"] is not None:
                 is_live = True
@@ -42,5 +57,7 @@ class SoopBot(discord.Client):
         except Exception as e:
             print(f"에러: {e}")
 
+# --- 3. 실행 ---
+keep_alive() # 가짜 웹서버 먼저 실행
 client = SoopBot()
 client.run(TOKEN)
