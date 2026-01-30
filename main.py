@@ -22,8 +22,8 @@ def keep_alive():
 
 # --- 2. 봇 설정 ---
 TOKEN = os.environ.get('DISCORD_TOKEN')
-CHANNEL_ID = 123456789012345678 # [수정필요] 본인의 채널 ID 숫자
-BJ_ID = 'target_id' # [수정필요] 대상 BJ 아이디
+CHANNEL_ID = 1391612789918793810 # [수정필요] 본인의 채널 ID 숫자
+BJ_ID = 'sksjr' # [수정필요] 대상 BJ 아이디
 
 class SoopBot(discord.Client):
     def __init__(self):
@@ -49,7 +49,7 @@ class SoopBot(discord.Client):
             
             if is_live and not self.is_online:
                 channel = self.get_channel(CHANNEL_ID)
-                await channel.send(f"🚨 {BJ_ID}님이 방송을 켰습니다!\nhttps://bj.afreecatv.com/{BJ_ID}")
+                await channel.send(f"🚨 페가소스(sksjr)님이 방송을 켰습니다!\nhttps://bj.afreecatv.com/{BJ_ID}")
                 self.is_online = True
             elif not is_live:
                 self.is_online = False
@@ -61,3 +61,4 @@ class SoopBot(discord.Client):
 keep_alive() # 가짜 웹서버 먼저 실행
 client = SoopBot()
 client.run(TOKEN)
+
