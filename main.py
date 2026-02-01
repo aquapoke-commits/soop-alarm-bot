@@ -25,9 +25,11 @@ CHANNEL_ID = 1391612789918793810 # [수정필요] 본인의 실제 채널 ID
 
 # [핵심 변경] 감시할 스트리머 목록 (아이디: 닉네임)
 TARGET_STREAMERS = {
-    'sksjr': '페가소스',
-    'brake0': '브레이버',
-    '1023mez': '페타'
+    'sksjr': 'DNS_Pegasos',
+    'brake0': 'DNS_Braver',
+    'dna0509': 'DNS_EnKoe',
+    'lavishboy2': 'DNS_Reroll',
+    'kdh3063': 'DNS_KAMDONG'
     # 여기에 계속 추가 가능: '아이디': '표시할이름',
 }
 
@@ -80,4 +82,5 @@ class SoopBot(discord.Client):
 keep_alive()
 client = SoopBot()
 client.run(TOKEN)
+
 
