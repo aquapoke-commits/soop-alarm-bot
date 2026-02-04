@@ -44,7 +44,7 @@ class SoopBot(discord.Client):
         print(f'{self.user} 봇 가동 시작! 감시 대상: {len(TARGET_STREAMERS)}명')
         self.check_stream.start()
 
-    @tasks.loop(minutes=1)
+@tasks.loop(minutes=1)
     async def check_stream(self):
         # 명단에 있는 스트리머를 한 명씩 차례대로 확인 (for문)
         for bj_id, nickname in TARGET_STREAMERS.items():
@@ -56,17 +56,23 @@ class SoopBot(discord.Client):
                 data = res.json()
                 
                 is_now_live = False
+                broad_no = None # 방송 번호 담을 변수 초기화
+
+                # 방송 중인지 확인하는 로직
                 if "broad" in data and data["broad"] is not None:
                     is_now_live = True
+                    broad_no = data["broad"]["broad_no"] # [핵심] 방송 고유 번호 추출
                 
                 # 방송이 켜졌고(True), 봇이 기억하는 상태는 꺼짐(False)일 때 -> 알림 발송
                 if is_now_live and not self.live_status[bj_id]:
                     channel = self.get_channel(CHANNEL_ID)
                     
-                    # 닉네임을 활용해서 알림 메시지를 보냄
+                    # [수정됨] 방송 번호를 포함한 직통 링크 생성
+                    live_link = f"https://play.sooplive.co.kr/{bj_id}/{broad_no}"
+
                     await channel.send(
                         f"🚨 **{nickname}**({bj_id})님이 방송을 켰습니다!\n"
-                        f"보러가기: https://bj.afreecatv.com/{bj_id}"
+                        f"보러가기: {live_link}"
                     )
                     
                     # 이 사람의 상태를 '방송 중'으로 변경
@@ -83,6 +89,7 @@ class SoopBot(discord.Client):
 keep_alive()
 client = SoopBot()
 client.run(TOKEN)
+
 
 
 
