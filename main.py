@@ -19,11 +19,11 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# --- 2. 봇 설정 (여러 명 관리 모드) ---
+# --- 2. 봇 설정 ---
 TOKEN = os.environ.get('DISCORD_TOKEN')
-CHANNEL_ID = 1391612789918793810 # [수정필요] 본인의 실제 채널 ID
+CHANNEL_ID = 1391612789918793810 # 작성자님 채널 ID
 
-# [핵심 변경] 감시할 스트리머 목록 (아이디: 닉네임)
+# 감시할 스트리머 목록
 TARGET_STREAMERS = {
     'sksjr': 'DNS_Pegasos',
     'brake0': 'DNS_Braver',
@@ -31,22 +31,21 @@ TARGET_STREAMERS = {
     'lavishboy2': 'DNS_Reroll',
     'kdh3063': 'DNS_KAMDONG',
     'aquapoke': 'DNS_EeDuGi'
-    # 여기에 계속 추가 가능: '아이디': '표시할이름',
 }
 
 class SoopBot(discord.Client):
     def __init__(self):
         super().__init__(intents=discord.Intents.default())
-        # 각 스트리머별로 방송 중인지 따로따로 기억해야 함 (초기값은 모두 False/방송안함)
+        # 각 스트리머별 방송 상태 기억 (초기값: False)
         self.live_status = {bj_id: False for bj_id in TARGET_STREAMERS}
 
     async def on_ready(self):
         print(f'{self.user} 봇 가동 시작! 감시 대상: {len(TARGET_STREAMERS)}명')
         self.check_stream.start()
 
-@tasks.loop(minutes=1)
+    @tasks.loop(minutes=1)
     async def check_stream(self):
-        # 명단에 있는 스트리머를 한 명씩 차례대로 확인 (for문)
+        # 명단에 있는 스트리머를 한 명씩 차례대로 확인
         for bj_id, nickname in TARGET_STREAMERS.items():
             url = f"https://bjapi.afreecatv.com/api/{bj_id}/station"
             headers = {"User-Agent": "Mozilla/5.0"}
@@ -56,14 +55,15 @@ class SoopBot(discord.Client):
                 data = res.json()
                 
                 is_now_live = False
-                broad_no = None # 방송 번호 담을 변수 초기화
+                broad_no = None # 방송 번호 담을 변수
 
-                # 방송 중인지 확인하는 로직
+                # 방송 중인지 확인
                 if "broad" in data and data["broad"] is not None:
                     is_now_live = True
-                    broad_no = data["broad"]["broad_no"] # [핵심] 방송 고유 번호 추출
+                    # [핵심] 방송 고유 번호 추출 (직통 링크용)
+                    broad_no = data["broad"]["broad_no"]
                 
-                # 방송이 켜졌고(True), 봇이 기억하는 상태는 꺼짐(False)일 때 -> 알림 발송
+                # 방송이 켜졌고(True), 봇 기억은 꺼짐(False)일 때 -> 알림 발송
                 if is_now_live and not self.live_status[bj_id]:
                     channel = self.get_channel(CHANNEL_ID)
                     
@@ -75,7 +75,7 @@ class SoopBot(discord.Client):
                         f"보러가기: {live_link}"
                     )
                     
-                    # 이 사람의 상태를 '방송 중'으로 변경
+                    # 상태를 '방송 중'으로 변경
                     self.live_status[bj_id] = True
                     
                 # 방송이 꺼져있다면 상태를 '방송 종료'로 변경
@@ -89,7 +89,3 @@ class SoopBot(discord.Client):
 keep_alive()
 client = SoopBot()
 client.run(TOKEN)
-
-
-
-
