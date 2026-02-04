@@ -29,7 +29,8 @@ TARGET_STREAMERS = {
     'brake0': 'DNS_Braver',
     'dna0509': 'DNS_EnKoe',
     'lavishboy2': 'DNS_Reroll',
-    'kdh3063': 'DNS_KAMDONG'
+    'kdh3063': 'DNS_KAMDONG',
+    'aquapoke': 'DNS_EeDuGi'
     # 여기에 계속 추가 가능: '아이디': '표시할이름',
 }
 
@@ -82,5 +83,6 @@ class SoopBot(discord.Client):
 keep_alive()
 client = SoopBot()
 client.run(TOKEN)
+
 
 
