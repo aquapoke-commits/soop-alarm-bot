@@ -26,7 +26,7 @@ TOKEN = os.environ.get('DISCORD_TOKEN')
 # 쉼표(,)로 구분해서 계속 추가할 수 있습니다.
 TARGET_CHANNELS = [
     1391612789918793810,  # 기존 채널 (GGX 디스코드 Prototype)
-    692697005935296554, # DN SOOPers TCG 채널
+    1021292080045232150, # DN SOOPers TCG 채널
 ]
 
 # 감시할 스트리머 목록
@@ -95,3 +95,4 @@ class SoopBot(discord.Client):
 keep_alive()
 client = SoopBot()
 client.run(TOKEN)
+
