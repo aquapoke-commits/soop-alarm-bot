@@ -21,7 +21,13 @@ def keep_alive():
 
 # --- 2. 봇 설정 ---
 TOKEN = os.environ.get('DISCORD_TOKEN')
-CHANNEL_ID = 1391612789918793810 # 작성자님 채널 ID
+
+# [수정됨] 여러 채널 ID를 리스트([])로 관리합니다.
+# 쉼표(,)로 구분해서 계속 추가할 수 있습니다.
+TARGET_CHANNELS = [
+    1391612789918793810,  # 기존 채널 (GGX 디스코드 Prototype)
+    692697005935296554, # DN SOOPers TCG 채널
+]
 
 # 감시할 스트리머 목록
 TARGET_STREAMERS = {
@@ -55,25 +61,25 @@ class SoopBot(discord.Client):
                 data = res.json()
                 
                 is_now_live = False
-                broad_no = None # 방송 번호 담을 변수
+                broad_no = None 
 
                 # 방송 중인지 확인
                 if "broad" in data and data["broad"] is not None:
                     is_now_live = True
-                    # [핵심] 방송 고유 번호 추출 (직통 링크용)
                     broad_no = data["broad"]["broad_no"]
                 
                 # 방송이 켜졌고(True), 봇 기억은 꺼짐(False)일 때 -> 알림 발송
                 if is_now_live and not self.live_status[bj_id]:
-                    channel = self.get_channel(CHANNEL_ID)
-                    
-                    # [수정됨] 방송 번호를 포함한 직통 링크 생성
+                    # [수정됨] 리스트에 있는 모든 채널에 알림 전송 (for문)
                     live_link = f"https://play.sooplive.co.kr/{bj_id}/{broad_no}"
 
-                    await channel.send(
-                        f"🚨 **{nickname}**({bj_id})님이 방송을 켰습니다!\n"
-                        f"보러가기: {live_link}"
-                    )
+                    for channel_id in TARGET_CHANNELS:
+                        channel = self.get_channel(channel_id)
+                        if channel: # 채널이 진짜 존재하는지 확인
+                            await channel.send(
+                                f"🚨 **{nickname}**({bj_id})님이 방송을 켰습니다!\n"
+                                f"보러가기: {live_link}"
+                            )
                     
                     # 상태를 '방송 중'으로 변경
                     self.live_status[bj_id] = True
